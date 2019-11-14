@@ -9,6 +9,7 @@ import java.util.List;
  */
 
 public class Weather {
+    public static final String key = "bc0418b57b2d4918819d3974ac1285d9";
     public String status;
     public Basic basic;
     public Suggestion suggestion;

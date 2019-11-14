@@ -1,5 +1,6 @@
 package com.example.a93736.coolweather;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -24,6 +25,7 @@ import com.bumptech.glide.load.data.StreamAssetPathFetcher;
 import com.bumptech.glide.util.Util;
 import com.example.a93736.coolweather.gson.Forecast;
 import com.example.a93736.coolweather.gson.Weather;
+import com.example.a93736.coolweather.service.AutoUpdateService;
 import com.example.a93736.coolweather.util.HttpUtil;
 import com.example.a93736.coolweather.util.Utility;
 
@@ -109,9 +111,8 @@ public class WeatherActivity extends AppCompatActivity {
         });
     }
     public void requestWeather(final String weatherId){
-        String key = "bc0418b57b2d4918819d3974ac1285d9";
         String weatherUrl = "http://guolin.tech/api/weather?cityid=" +
-                weatherId + "&key="+key;
+                weatherId + "&key="+Weather.key;
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -150,6 +151,10 @@ public class WeatherActivity extends AppCompatActivity {
         });
     }
     private void showWeatherInfo(Weather weather){
+        if(weather == null ||!"ok".equals(weather.status)){
+            Toast.makeText(WeatherActivity.this,"获取天气信息失败",Toast.LENGTH_SHORT).show();
+            return;
+        }
         String cityName = weather.basic.cityName;
         String updateTime = weather.basic.update.updateTime.split(" ")[1];
         String degree = weather.now.temperature + "℃";
@@ -197,6 +202,8 @@ public class WeatherActivity extends AppCompatActivity {
         carWashText.setText(carWash);
         sportText.setText(sport);
         weatherLayout.setVisibility(View.VISIBLE);
+        Intent intent = new Intent(this, AutoUpdateService.class);
+        startService(intent);
 
     }
     private void loadBingPic(){
